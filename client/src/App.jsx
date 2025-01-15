@@ -1,35 +1,23 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Outlet } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Navbar, Nav, NavbarCollapse } from "react-bootstrap";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Navbar bg="dark" variant="dark" expand="lg" className="px-5">
+        <Navbar.Brand href="/">Hillary&apos;s Hair Care</Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <NavbarCollapse id="navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="/appointments">Appointments</Nav.Link>
+          </Nav>
+        </NavbarCollapse>
+      </Navbar>
+      <Outlet />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

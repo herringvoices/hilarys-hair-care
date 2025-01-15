@@ -11,5 +11,7 @@ namespace HillarysHairCare.Models
         public Customer Customer { get; set; }
         public int StylistId { get; set; }
         public Stylist Stylist { get; set; }
+        public List<AppointmentService> AppointmentServices { get; set; } =
+            new List<AppointmentService>();
     }
 }
