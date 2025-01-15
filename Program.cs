@@ -92,4 +92,71 @@ app.MapGet(
     }
 );
 
+//Stylist Endpoints
+//GET all Stylists
+app.MapGet(
+    "/api/stylists",
+    async (HillarysHairCareDbContext db) =>
+    {
+        var stylists = await db
+            .Stylists.Include(s => s.Appointments)
+            .ThenInclude(a => a.Customer)
+            .Include(s => s.Appointments)
+            .ThenInclude(a => a.AppointmentServices)
+            .ThenInclude(aps => aps.Service)
+            .Select(s => new StylistDTO
+            {
+                Id = s.Id,
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                PhoneNumber = s.PhoneNumber,
+                Email = s.Email,
+                IsActive = s.IsActive,
+                Appointments = s
+                    .Appointments.Select(a => new AppointmentDTO
+                    {
+                        Id = a.Id,
+                        Title = a.Title,
+                        Start = a.Start,
+                        End = a.End,
+                        AllDay = a.AllDay,
+                        ExtendedProps = new AppointmentDTO.ExtendedPropsDTO
+                        {
+                            CustomerId = a.CustomerId,
+                            Customer = new CustomerDTO
+                            {
+                                Id = a.Customer.Id,
+                                FirstName = a.Customer.FirstName,
+                                LastName = a.Customer.LastName,
+                                PhoneNumber = a.Customer.PhoneNumber,
+                                Email = a.Customer.Email,
+                            },
+                            StylistId = a.StylistId,
+                            Stylist = new StylistDTO
+                            {
+                                Id = a.Stylist.Id,
+                                FirstName = a.Stylist.FirstName,
+                                LastName = a.Stylist.LastName,
+                                Email = a.Stylist.Email,
+                                PhoneNumber = a.Stylist.PhoneNumber,
+                                IsActive = a.Stylist.IsActive,
+                            },
+                            Services = a
+                                .AppointmentServices.Select(aps => new ServiceDTO
+                                {
+                                    Id = aps.Service.Id,
+                                    Name = aps.Service.Name,
+                                    Price = aps.Service.Price,
+                                })
+                                .ToList(),
+                        },
+                    })
+                    .ToList(),
+            })
+            .ToListAsync();
+
+        return Results.Ok(stylists);
+    }
+);
+
 app.Run();
