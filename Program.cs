@@ -114,6 +114,8 @@ app.MapPost(
     }
 );
 
+
+
 //DELETE Appointment
 app.MapDelete(
     "api/appointments/{id}",
@@ -146,6 +148,30 @@ app.MapPost(
             $"/api/appointment-services/{appointmentService.Id}",
             appointmentService
         );
+    }
+);
+app.MapPost(
+    "/api/appointment-services/batch",
+    async (HillarysHairCareDbContext db, List<AppointmentService> appointmentServices) =>
+    {
+        if (appointmentServices == null || !appointmentServices.Any())
+        {
+            return Results.BadRequest("The appointment services list is empty.");
+        }
+
+        var appointmentId = appointmentServices.First().AppointmentId;
+
+        // Delete existing appointment services with the same AppointmentId
+        var existingServices = db.AppointmentServices.Where(aps =>
+            aps.AppointmentId == appointmentId
+        );
+        db.AppointmentServices.RemoveRange(existingServices);
+
+        // Add new appointment services
+        db.AppointmentServices.AddRange(appointmentServices);
+        await db.SaveChangesAsync();
+
+        return Results.Created($"/api/appointment-services/batch", appointmentServices);
     }
 );
 

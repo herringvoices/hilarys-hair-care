@@ -6,14 +6,18 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { Alert, Col, Row } from "react-bootstrap";
 import StylistSelect from "./StylistSelect";
 import { getAppointmentsByStylistId } from "../../services/appointmentServices";
-import AppointmentModal from "./AppointmentModal";
+import NewAppointmentModal from "./NewAppointmentModal";
+import EditAppointmentModal from "./EditAppointmentModal";
 
 function Appointments() {
   const [appointments, setAppointments] = useState([]);
   const [stylistId, setStylistId] = useState(null);
-  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [showNewAppointmentModal, setShowNewAppointmentModal] = useState(false);
+  const [showEditAppointmentModal, setShowEditAppointmentModal] =
+    useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [alertMessage, setAlertMessage] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState({});
 
   const getAndSetAppointments = async () => {
     if (stylistId) {
@@ -32,7 +36,7 @@ function Appointments() {
       const selectedDate = new Date(info.dateStr);
       if (selectedDate.getMinutes() === 0) {
         setSelectedDate(info.dateStr);
-        setShowAppointmentModal(true);
+        setShowNewAppointmentModal(true);
       } else {
         setAlertMessage("Please select a time at the top of the hour");
       }
@@ -42,14 +46,19 @@ function Appointments() {
   };
 
   const handleEventClick = (info) => {
-    console.log("Event clicked:", info.event);
-    // TODO: Open a AppointmentModal to edit the selected appointment
+    setSelectedEvent(info.event);
+    setShowEditAppointmentModal(true);
   };
 
   // Handle Appointment Modal close
-  const handleAppointmentModalClose = () => {
-    setShowAppointmentModal(false); // Close the Appointment Modal
+  const handleNewAppointmentModalClose = () => {
+    setShowNewAppointmentModal(false); // Close the Appointment Modal
     setSelectedDate(null); // Reset the selected date
+  };
+  // Handle Appointment Modal close
+  const handleEditAppointmentModalClose = () => {
+    setShowEditAppointmentModal(false); // Close the Appointment Modal
+    setSelectedEvent(null); // Reset the selected event
   };
 
   const handleAlertClose = () => {
@@ -81,13 +90,21 @@ function Appointments() {
           selectable={true} // Allow selecting time slots
           nowIndicator={true} // Show current time indicator
         />
-        {showAppointmentModal && (
-          <AppointmentModal
-            show={showAppointmentModal}
-            onClose={handleAppointmentModalClose}
+        {showNewAppointmentModal && (
+          <NewAppointmentModal
+            show={showNewAppointmentModal}
+            onClose={handleNewAppointmentModalClose}
             selectedDate={selectedDate}
             stylistId={stylistId}
             getAndSet={getAndSetAppointments}
+          />
+        )}
+        {showEditAppointmentModal && (
+          <EditAppointmentModal
+            selectedEvent={selectedEvent}
+            getAndSet={getAndSetAppointments}
+            show={showEditAppointmentModal}
+            onClose={handleEditAppointmentModalClose}
           />
         )}
       </Col>
