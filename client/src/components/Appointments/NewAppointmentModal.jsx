@@ -11,10 +11,7 @@ import {
 } from "react-bootstrap";
 import { getCustomerByPhoneNumber } from "../../services/customerServices";
 import { getAllServices } from "../../services/serviceServices";
-import {
-  addAppointment,
-  deleteAppointment,
-} from "../../services/appointmentServices";
+import { addAppointment } from "../../services/appointmentServices";
 import { addAppointmentService } from "../../services/appointmentServicesServices";
 
 function AppointmentModal({
@@ -128,11 +125,6 @@ function AppointmentModal({
       console.error("Error saving appointment:", error);
     }
   };
-
-  // const handleCancel = async (event)=>{
-  //   event.preventDefault()
-  //   deleteAppointment()
-  // }
 
   return (
     <>
