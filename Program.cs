@@ -114,8 +114,6 @@ app.MapPost(
     }
 );
 
-
-
 //DELETE Appointment
 app.MapDelete(
     "api/appointments/{id}",
@@ -375,6 +373,17 @@ app.MapGet(
         }
 
         return Results.Ok(customer);
+    }
+);
+
+//POST new customer
+app.MapPost(
+    "api/customers",
+    async (HillarysHairCareDbContext db, Customer customer) =>
+    {
+        db.Customers.Add(customer);
+        await db.SaveChangesAsync();
+        return Results.Created($"/api/customers/{customer.Id}", customer);
     }
 );
 

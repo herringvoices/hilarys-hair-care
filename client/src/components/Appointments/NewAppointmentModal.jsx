@@ -13,6 +13,7 @@ import { getCustomerByPhoneNumber } from "../../services/customerServices";
 import { getAllServices } from "../../services/serviceServices";
 import { addAppointment } from "../../services/appointmentServices";
 import { addAppointmentService } from "../../services/appointmentServicesServices";
+import AddCustomerModal from "../Customers/AddCustomerModal";
 
 function AppointmentModal({
   show,
@@ -28,6 +29,7 @@ function AppointmentModal({
   const [checkedServices, setCheckedServices] = useState([]);
   const [total, setTotal] = useState(0);
   const [eventDate, setEventDate] = useState("");
+  const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
 
   useEffect(() => {
     getAllServices().then(setServices);
@@ -126,6 +128,10 @@ function AppointmentModal({
     }
   };
 
+  const handleAddCustomerModalClose = () => {
+    setShowAddCustomerModal(false);
+  };
+
   return (
     <>
       <Modal show={show} onHide={onClose}>
@@ -153,12 +159,23 @@ function AppointmentModal({
                   </Col>
                 </Row>
                 <h3 className="fs-6">Customer Name:</h3>
-                <p className="fs-3">
-                  {customer
-                    ? `${customer.firstName} ${customer.lastName}`
-                    : "No Customer Selected"}
-                </p>
-                <Button variant="dark">Add new Customer</Button>
+                <Row>
+                  <Col xs={9}>
+                    <p className="fs-3">
+                      {customer
+                        ? `${customer.firstName} ${customer.lastName}`
+                        : "No Customer Selected"}
+                    </p>
+                  </Col>
+                  <Col xs={2}>
+                    <Button
+                      variant="dark"
+                      onClick={() => setShowAddCustomerModal(true)}
+                    >
+                      +
+                    </Button>
+                  </Col>
+                </Row>
               </Form.Group>
               <Form.Group>
                 <Form.Label>Service Requested:</Form.Label>
@@ -194,6 +211,11 @@ function AppointmentModal({
               </Button>
             </Col>
           </Row>
+          <AddCustomerModal
+            show={showAddCustomerModal}
+            onClose={handleAddCustomerModalClose}
+            setCustomer={setCustomer}
+          />
         </Modal.Body>
       </Modal>
 
