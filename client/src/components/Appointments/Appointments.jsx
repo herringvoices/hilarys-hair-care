@@ -3,36 +3,68 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Col, Row } from "react-bootstrap";
+import { Alert, Col, Row } from "react-bootstrap";
 import StylistSelect from "./StylistSelect";
 import { getAppointmentsByStylistId } from "../../services/appointmentServices";
+import AppointmentModal from "./AppointmentModal";
 
 function Appointments() {
   const [appointments, setAppointments] = useState([]);
   const [stylistId, setStylistId] = useState(null);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [alertMessage, setAlertMessage] = useState(null);
 
+  const getAndSetAppointments = async () => {
+    if (stylistId) {
+      const appointments = await getAppointmentsByStylistId(stylistId);
+      setAppointments(appointments);
+    }
+  };
   // Fetch appointments from the API
   useEffect(() => {
-    if (stylistId) {
-      getAppointmentsByStylistId(stylistId).then(setAppointments);
-    }
+    getAndSetAppointments();
   }, [stylistId]);
 
   // Handle date or event clicks
   const handleDateClick = (info) => {
-    console.log("Date clicked:", info.dateStr);
-    // TODO: Open a modal to create a new appointment
+    if (stylistId) {
+      const selectedDate = new Date(info.dateStr);
+      if (selectedDate.getMinutes() === 0) {
+        setSelectedDate(info.dateStr);
+        setShowAppointmentModal(true);
+      } else {
+        setAlertMessage("Please select a time at the top of the hour");
+      }
+    } else {
+      setAlertMessage("Please select a stylist first");
+    }
   };
 
   const handleEventClick = (info) => {
     console.log("Event clicked:", info.event);
-    // TODO: Open a modal to edit the selected appointment
+    // TODO: Open a AppointmentModal to edit the selected appointment
+  };
+
+  // Handle Appointment Modal close
+  const handleAppointmentModalClose = () => {
+    setShowAppointmentModal(false); // Close the Appointment Modal
+    setSelectedDate(null); // Reset the selected date
+  };
+
+  const handleAlertClose = () => {
+    setAlertMessage(null); // Close the alert message
   };
 
   return (
     <Row>
       <Col xs={12} md={10} className="mx-auto">
         <h1>Appointments</h1>
+        {alertMessage && (
+          <Alert variant="warning" onClose={handleAlertClose} dismissible>
+            {alertMessage}
+          </Alert>
+        )}
         <StylistSelect setId={setStylistId} />
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -45,10 +77,19 @@ function Appointments() {
           events={appointments} // Pass fetched appointments
           dateClick={handleDateClick} // Handle date clicks
           eventClick={handleEventClick} // Handle event clicks
-          editable={true} // Allow dragging and resizing
+          editable={false} // Allow dragging and resizing
           selectable={true} // Allow selecting time slots
           nowIndicator={true} // Show current time indicator
         />
+        {showAppointmentModal && (
+          <AppointmentModal
+            show={showAppointmentModal}
+            onClose={handleAppointmentModalClose}
+            selectedDate={selectedDate}
+            stylistId={stylistId}
+            getAndSet={getAndSetAppointments}
+          />
+        )}
       </Col>
     </Row>
   );
