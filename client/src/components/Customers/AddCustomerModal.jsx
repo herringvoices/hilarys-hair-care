@@ -4,13 +4,20 @@ import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { addCustomer } from "../../services/customerServices";
 
 function AddCustomerModal({ show, onClose, setCustomer }) {
-  const [newCustomer, setNewCustomer] = useState({});
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+  });
 
   const handleSubmit = async () => {
     // Add the customer to the database
     const addedCustomer = await addCustomer(newCustomer);
     // Set the customer in the parent component
-    setCustomer(addedCustomer);
+    if (setCustomer) {
+      setCustomer(addedCustomer);
+    }
     // Close the modal
     onClose();
   };
@@ -85,7 +92,12 @@ function AddCustomerModal({ show, onClose, setCustomer }) {
         </Row>
         <Row>
           <Col xs={4} className="mx-auto mt-3">
-            <Button onClick={handleSubmit}>Submit</Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={Object.values(newCustomer).some((value) => !value)}
+            >
+              Submit
+            </Button>
           </Col>
         </Row>
       </Modal.Body>
