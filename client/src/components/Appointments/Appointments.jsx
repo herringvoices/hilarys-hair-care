@@ -89,6 +89,10 @@ function Appointments() {
           editable={false} // Allow dragging and resizing
           selectable={true} // Allow selecting time slots
           nowIndicator={true} // Show current time indicator
+          slotMinTime="08:00:00" // Start time (8 AM)
+          slotMaxTime="18:00:00" // End time (6 PM)
+          height="auto"
+          allDaySlot={false} // Turn off the "All Day" section
         />
         {showNewAppointmentModal && (
           <NewAppointmentModal
