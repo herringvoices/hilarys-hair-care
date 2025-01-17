@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using HillarysHairCare.DTOs;
 using HillarysHairCare.Models;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -237,6 +238,122 @@ app.MapGet(
             .ToListAsync();
 
         return Results.Ok(stylists);
+    }
+);
+
+//GET a stylist by Id
+app.MapGet(
+    "/api/stylists/{id}",
+    async (HillarysHairCareDbContext db, int id) =>
+    {
+        //Include appointments, customers, and services in the response
+        var stylist = await db
+            .Stylists.Include(s => s.Appointments)
+            .ThenInclude(a => a.Customer)
+            .Include(s => s.Appointments)
+            .ThenInclude(a => a.AppointmentServices)
+            .ThenInclude(aps => aps.Service)
+            //Filter by stylist Id
+            .Where(s => s.Id == id)
+            //map the stylist to a DTO
+            .Select(s => new StylistDTO
+            {
+                Id = s.Id,
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                PhoneNumber = s.PhoneNumber,
+                Email = s.Email,
+                IsActive = s.IsActive,
+                Appointments = s
+                    .Appointments.Select(a => new AppointmentDTO
+                    {
+                        Id = a.Id,
+                        Title = a.Title,
+                        Start = a.Start,
+                        End = a.End,
+                        AllDay = a.AllDay,
+                        ExtendedProps = new AppointmentDTO.ExtendedPropsDTO
+                        {
+                            CustomerId = a.CustomerId,
+                            Customer = new CustomerDTO
+                            {
+                                Id = a.Customer.Id,
+                                FirstName = a.Customer.FirstName,
+                                LastName = a.Customer.LastName,
+                                PhoneNumber = a.Customer.PhoneNumber,
+                                Email = a.Customer.Email,
+                            },
+                            StylistId = a.StylistId,
+                            Stylist = new StylistDTO
+                            {
+                                Id = a.Stylist.Id,
+                                FirstName = a.Stylist.FirstName,
+                                LastName = a.Stylist.LastName,
+                                Email = a.Stylist.Email,
+                                PhoneNumber = a.Stylist.PhoneNumber,
+                                IsActive = a.Stylist.IsActive,
+                            },
+                            Services = a
+                                .AppointmentServices.Select(aps => new ServiceDTO
+                                {
+                                    Id = aps.Service.Id,
+                                    Name = aps.Service.Name,
+                                    Price = aps.Service.Price,
+                                })
+                                .ToList(),
+                        },
+                    })
+                    .ToList(),
+            })
+            //return the first stylist in the list
+            .FirstOrDefaultAsync();
+    }
+);
+
+//POST new stylist
+app.MapPost(
+    "/api/stylists",
+    async (HillarysHairCareDbContext db, Stylist stylist) =>
+    {
+        db.Stylists.Add(stylist);
+        await db.SaveChangesAsync();
+        return Results.Created($"/api/stylists/{stylist.Id}", stylist);
+    }
+);
+
+//PUT update stylist
+app.MapPut(
+    "/api/stylists/{id}",
+    async (HillarysHairCareDbContext db, int id, Stylist stylist) =>
+    {
+        if (id != stylist.Id)
+        {
+            return Results.BadRequest("Id mismatch");
+        }
+        var existingStylist = await db.Stylists.FindAsync(id);
+        if (existingStylist == null)
+        {
+            return Results.NotFound();
+        }
+        db.Entry(existingStylist).CurrentValues.SetValues(stylist);
+        await db.SaveChangesAsync();
+        return Results.NoContent();
+    }
+);
+
+//Soft DELETE stylist by changing IsActive to false
+app.MapDelete(
+    "/api/stylists/{id}",
+    (HillarysHairCareDbContext db, int id) =>
+    {
+        var stylist = db.Stylists.Find(id);
+        if (stylist == null)
+        {
+            return Results.NotFound();
+        }
+        stylist.IsActive = false;
+        db.SaveChanges();
+        return Results.NoContent();
     }
 );
 

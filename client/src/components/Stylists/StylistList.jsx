@@ -1,19 +1,44 @@
 import { useEffect, useState } from "react";
 import { getAllStylists } from "../../services/stylistServices";
 import { Col, Container, Row } from "react-bootstrap";
+import AddStylistModal from "./AddStylistModal";
 
 function StylistList() {
   const [stylists, setStylists] = useState([]);
+  const [showAddStylistModal, setShowAddStylistModal] = useState(false);
+
+  const handleAddStylistModalClose = () => {
+    setShowAddStylistModal(false);
+  };
+
+  const getAndSetStylists = async () => {
+    const stylists = await getAllStylists();
+    setStylists(stylists);
+  };
+
+  useEffect(() => {
+    getAndSetStylists();
+  }, []);
 
   useEffect(() => {
     // Fetch stylists from the API
-    getAllStylists().then(setStylists);
   }, []);
 
   return (
     <Container>
       <Row className="m-3">
-        <h2>Stylists</h2>
+        <Col sm={{ span: 4, offset: 4 }}>
+          <h2>Stylists</h2>
+        </Col>
+        <Col sm={{ span: 2 }}>
+          <button
+            className="btn btn-dark"
+            onClick={() => setShowAddStylistModal(true)}
+          >
+            +
+          </button>
+        </Col>
+        <Col sm={2}></Col>
       </Row>
       <Row className="m-3">
         {stylists.map((stylist) => (
@@ -27,6 +52,12 @@ function StylistList() {
           </Col>
         ))}
       </Row>
+      <AddStylistModal
+        show={showAddStylistModal}
+        onClose={handleAddStylistModalClose}
+        getAndSet={getAndSetStylists}
+      />
+      ;
     </Container>
   );
 }
