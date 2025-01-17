@@ -24,10 +24,21 @@ export const addStylist = async (stylist) => {
 
 //delete stylist by id
 export const deleteStylist = async (id) => {
-  await fetch(`api/stylists/${id}`, {
+  await fetch(`/api/stylists/${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
+  });
+};
+
+//update stylist by id
+export const updateStylist = async (id, stylist) => {
+  await fetch(`/api/stylists/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(stylist),
   });
 };
