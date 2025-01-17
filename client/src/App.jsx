@@ -13,6 +13,7 @@ function App() {
           <Nav className="me-auto">
             <Nav.Link href="/appointments">Appointments</Nav.Link>
             <Nav.Link href="/stylists">Stylists</Nav.Link>
+            <Nav.Link href="/customers">Customers</Nav.Link>
           </Nav>
         </NavbarCollapse>
       </Navbar>

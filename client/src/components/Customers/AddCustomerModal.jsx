@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { addCustomer } from "../../services/customerServices";
 
-function AddCustomerModal({ show, onClose, setCustomer }) {
+function AddCustomerModal({ show, onClose, setCustomer, getAndSet }) {
   const [newCustomer, setNewCustomer] = useState({
     firstName: "",
     lastName: "",
@@ -17,6 +17,8 @@ function AddCustomerModal({ show, onClose, setCustomer }) {
     // Set the customer in the parent component
     if (setCustomer) {
       setCustomer(addedCustomer);
+    } else if (getAndSet) {
+      getAndSet();
     }
     // Close the modal
     onClose();
