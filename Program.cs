@@ -307,6 +307,9 @@ app.MapGet(
             })
             //return the first stylist in the list
             .FirstOrDefaultAsync();
+        return stylist != null
+            ? Results.Ok(stylist) // Return the stylist if found
+            : Results.NotFound($"Stylist with ID {id} not found."); // Return 404 if not found
     }
 );
 
