@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getStylistById } from "../../services/stylistServices";
-import { Col, Container, Row, Table } from "react-bootstrap";
+import {
+  deleteStylist,
+  getStylistById,
+  updateStylist,
+} from "../../services/stylistServices";
+import { Button, Col, Container, Row, Table } from "react-bootstrap";
 
 function StylistDetails() {
   const [stylist, setStylist] = useState({});
@@ -26,9 +30,8 @@ function StylistDetails() {
     // Return formatted string
     return `${month}/${day}/${year} at ${hours}:${minutes}${ampm}`;
   }
-
-  useEffect(() => {
-    // Fetch stylist from the API
+  // Fetch stylist from the API
+  const getAndSetStylist = () => {
     getStylistById(parseInt(stylistId)).then((stylist) => {
       if (stylist && stylist.appointments) {
         stylist.appointments.sort(
@@ -37,7 +40,20 @@ function StylistDetails() {
       }
       setStylist(stylist);
     });
+  };
+
+  useEffect(() => {
+    getAndSetStylist();
   }, [stylistId]);
+
+  const handleSoftDelete = () => {
+    deleteStylist(stylist.id).then(getAndSetStylist);
+  };
+
+  const handleReactivate = () => {
+    const activatedStylist = { ...stylist, isActive: true };
+    updateStylist(stylist.id, activatedStylist).then(getAndSetStylist);
+  };
 
   return (
     <Container>
@@ -53,7 +69,16 @@ function StylistDetails() {
 
           <h3 className="fs-4 mb-0 mt-4">Email</h3>
           <p className="fs-2">{stylist.email}</p>
-          <div className="btn btn-success">{stylist.isActive && "Active"}</div>
+          {!stylist.isActive && (
+            <Button className="btn btn-danger" onClick={handleReactivate}>
+              Inactive
+            </Button>
+          )}
+          {stylist.isActive && (
+            <Button onClick={handleSoftDelete} className="btn btn-success">
+              Active
+            </Button>
+          )}
         </Col>
         <Col xs={12} md={5} className=" text-start mx-auto">
           <h3>Appointments</h3>
