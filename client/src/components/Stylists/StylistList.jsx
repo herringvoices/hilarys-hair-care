@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getAllStylists } from "../../services/stylistServices";
 import { Col, Container, Row } from "react-bootstrap";
 import AddStylistModal from "./AddStylistModal";
+import { Link } from "react-router-dom";
 
 function StylistList() {
   const [stylists, setStylists] = useState([]);
@@ -42,14 +43,14 @@ function StylistList() {
       </Row>
       <Row className="m-3">
         {stylists.map((stylist) => (
-          <Col
+          <Link
             key={stylist.id}
-            sm={12}
-            md={3}
-            className="bg-dark text-light p-3 m-3 rounded"
+            to={`/stylists/${stylist.id}`}
+            className="col-sm-12 col-md-3 bg-dark text-light p-3 m-3 rounded"
+            style={{ textDecoration: "none" }} // Optional: Remove link underline
           >
             {stylist.firstName + " " + stylist.lastName}
-          </Col>
+          </Link>
         ))}
       </Row>
       <AddStylistModal
@@ -57,7 +58,6 @@ function StylistList() {
         onClose={handleAddStylistModalClose}
         getAndSet={getAndSetStylists}
       />
-      ;
     </Container>
   );
 }

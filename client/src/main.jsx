@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import "./index.css";
 import Appointments from "./components/Appointments/Appointments.jsx";
 import StylistList from "./components/Stylists/StylistList.jsx";
+import StylistDetails from "./components/Stylists/StylistDetails.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -15,7 +16,7 @@ createRoot(document.getElementById("root")).render(
           <Route index element={<Appointments />} />
           <Route path="appointments" element={<Appointments />} />
           <Route path="stylists" element={<StylistList />} />
-
+          <Route path="stylists/:stylistId" element={<StylistDetails />} />
         </Route>
       </Routes>
     </BrowserRouter>
