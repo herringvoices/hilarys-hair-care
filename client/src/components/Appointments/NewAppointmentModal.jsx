@@ -201,14 +201,16 @@ function AppointmentModal({
             </Col>
             <Col xs={4}></Col>
             <Col xs={4}>
-              <Button
-                className="w-100"
-                variant="primary"
-                disabled={!customer || !total}
-                onClick={handleSubmit}
-              >
-                Save
-              </Button>
+              
+                <Button
+                  className="w-100"
+                  variant="primary"
+                  disabled={!customer || !total}
+                  onClick={handleSubmit}
+                >
+                  Save
+                </Button>
+              
             </Col>
           </Row>
           <AddCustomerModal
@@ -239,3 +241,6 @@ function AppointmentModal({
 }
 
 export default AppointmentModal;
+
+
+
